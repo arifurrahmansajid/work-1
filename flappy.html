@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Flappy Bird Game (Fixed)</title>
+  <style>
+    body {
+     font-family: 'Fredoka One', cursive;
+      background: url('Assets/gamebg.jpg') no-repeat center center fixed; /* 🔁 Replace with your image */
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      margin: 0;
+    }
+    
+
+    .game-container {
+      position: relative;
+      width: 700px;
+      height: 700px;
+      background: #cceeff;
+      border-radius: 30px;
+      border: 6px solid #333;
+      overflow: hidden;
+      box-shadow: 0 0 25px rgba(0,0,0,0.5);
+    }
+
+    .cloud {
+      position: absolute;
+      background: white;
+      border-radius: 50%;
+      opacity: 0.8;
+    }
+
+    .cloud1 {
+      width: 200px;
+      height: 80px;
+      top: 50px;
+      left: 100px;
+    }
+
+    .cloud2 {
+      width: 150px;
+      height: 60px;
+      top: 120px;
+      left: 400px;
+    }
+
+    .bird {
+      position: absolute;
+      width: 50px;
+      height: 50px;
+       background-image: url('https://raw.githubusercontent.com/sourabhv/FlapPyBird/master/assets/sprites/yellowbird-midflap.png');
+
+      
+      background-size: cover;
+      background-repeat: no-repeat;
+      background-position: center;
+      border-radius: 0%;
+       top: 300px; /* ✅ This is already okay */
+  left: 120px; 
+      animation: flap 0.5s infinite alternate;
+      z-index: 10;
+    }
+
+    @keyframes flap {
+      0% { transform: rotate(-10deg); }
+      100% { transform: rotate(10deg); }
+    }
+
+    .pipe {
+      position: absolute;
+      width: 80px;
+      background: #228B22;
+      animation: movePipe 6s linear forwards;
+    }
+
+    .pipe.top {
+      top: 0;
+      background: linear-gradient(to bottom, #2e8b57, #228B22);
+      border-bottom-left-radius: 30px;
+      border-bottom-right-radius: 30px;
+    }
+
+    .pipe.bottom {
+      bottom: 0;
+      background: linear-gradient(to top, #2e8b57, #228B22);
+      border-top-left-radius: 30px;
+      border-top-right-radius: 30px;
+    }
+
+    @keyframes movePipe {
+      0% { left: 700px; }
+      100% { left: -100px; }
+    }
+
+    .score {
+      position: absolute;
+      top: 15px;
+      left: 50%;
+      transform: translateX(-50%);
+      font-size: 2.5rem;
+      font-weight: bold;
+      background: rgba(255, 255, 255, 0.8);
+      padding: 8px 20px;
+      border-radius: 15px;
+      z-index: 10;
+    }
+
+    .game-over {
+      display: none;
+      position: absolute;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      font-size: 2rem;
+      background: white;
+      padding: 20px 30px;
+      border: 3px solid black;
+      border-radius: 15px;
+      color: red;
+      z-index: 20;
+    }
+
+    .start-btn {
+      position: absolute;
+      bottom: 20px;
+      left: 50%;
+      transform: translateX(-50%);
+      background:#228B22;
+      color: white;
+      font-size: 1.2rem;
+      padding: 12px 28px;
+      border-radius: 12px;
+      cursor: pointer;
+      border: none;
+      z-index: 15;
+    }
+
+    .start-btn:hover {
+      background-color: #555;
+    }
+    .go-back {
+  position: absolute;
+  top: 50px;
+  left: 100px;
+  background-color: #a4f4b0; /* 🟢 Light green */
+  color: #155724;
+  border: 3px solid #6bd97f;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 0 #6bd97f;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.go-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+  </style>
+</head>
+<body>
+
+  <div class="game-container" id="gameBox">
+    <div class="cloud cloud1"></div>
+    <div class="cloud cloud2"></div>
+    <div class="bird" id="bird"></div>
+    <div class="score" id="score">0</div>
+    <div class="game-over" id="gameOver">🎉 Game Over!</div>
+    <button class="start-btn" id="startBtn">Start Game</button>
+  </div>
+<button class="go-back" onclick="window.location.href='index.html'">⬅ Go Back</button>
+
+  <script>
+    const bird = document.getElementById('bird');
+    const scoreEl = document.getElementById('score');
+    const gameOverEl = document.getElementById('gameOver');
+    const startBtn = document.getElementById('startBtn');
+    const gameBox = document.getElementById('gameBox');
+
+    let gravity = 0.25;
+    let velocity = 0;
+    let isGameRunning = false;
+    let isGameOver = false;
+    let score = 0;
+    let pipesInterval, gameTimer;
+
+    function resetGame() {
+      velocity = 0;
+      score = 0;
+      isGameRunning = false;
+      isGameOver = false;
+      bird.style.top = '300px';
+      scoreEl.innerText = "0";
+      gameOverEl.style.display = "none";
+      document.querySelectorAll(".pipe").forEach(p => p.remove());
+    }
+
+    function startGame() {
+      resetGame();
+      isGameRunning = true;
+
+      pipesInterval = setInterval(createPipes, 2000);
+      gameTimer = setTimeout(() => {
+        endGame();
+      }, 40000); // 40 seconds
+      requestAnimationFrame(updateGame);
+    }
+
+    function updateGame() {
+      if (isGameOver || !isGameRunning) return;
+
+      let birdTop = parseFloat(getComputedStyle(bird).getPropertyValue("top"));
+velocity += gravity;
+birdTop += velocity;
+
+// ✅ LIMIT bird within box
+if (birdTop > 650) birdTop = 650;  // bottom boundary (700 - bird height)
+if (birdTop < 0) birdTop = 0;      // top boundary
+
+bird.style.top = birdTop + "px";
+      const pipes = document.querySelectorAll(".pipe");
+      pipes.forEach(pipe => {
+        let pipeLeft = parseFloat(getComputedStyle(pipe).getPropertyValue("left"));
+
+        if (pipeLeft <= 170 && pipeLeft + 80 >= 120) {
+          let birdBottom = birdTop + 50;
+          if (
+            (pipe.classList.contains("top") && birdTop < pipe.offsetHeight) ||
+            (pipe.classList.contains("bottom") && birdBottom > (700 - pipe.offsetHeight))
+          ) {
+            endGame();
+          }
+        }
+
+        if (pipeLeft + 80 < 120 && !pipe.passed) {
+          pipe.passed = true;
+          score++;
+          scoreEl.innerText = score;
+        }
+      });
+
+      requestAnimationFrame(updateGame);
+    }
+
+    function createPipes() {
+      const gap = 200;
+      const topHeight = Math.floor(Math.random() * 250) + 50;
+      const bottomHeight = 700 - topHeight - gap;
+
+      const topPipe = document.createElement("div");
+      topPipe.classList.add("pipe", "top");
+      topPipe.style.height = topHeight + "px";
+      topPipe.style.left = "700px";
+
+      const bottomPipe = document.createElement("div");
+      bottomPipe.classList.add("pipe", "bottom");
+      bottomPipe.style.height = bottomHeight + "px";
+      bottomPipe.style.left = "700px";
+
+      gameBox.appendChild(topPipe);
+      gameBox.appendChild(bottomPipe);
+
+      setTimeout(() => {
+        topPipe.remove();
+        bottomPipe.remove();
+      }, 4500);
+    }
+
+    function endGame() {
+      isGameOver = true;
+      isGameRunning = false;
+      gameOverEl.style.display = "block";
+      clearInterval(pipesInterval);
+      clearTimeout(gameTimer);
+    }
+
+    startBtn.addEventListener("click", startGame);
+
+    document.addEventListener("keydown", e => {
+  if (!isGameRunning) return;
+  if (e.key === "ArrowUp") {
+    velocity = -5.5;    // ✅ smooth upward flap
+  } else if (e.key === "ArrowDown") {
+    velocity += 1.5;  // ✅ softer down pull
+  }
+});
+  </script>
+</body>
+</html>

@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Emoji Guessing Game</title>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Luckiest+Guy&display=swap');
+
+    body {
+      margin: 0;
+      font-family: 'Luckiest Guy', cursive;
+      background: url('Assets/gamebg.jpg') no-repeat center center fixed;
+      background-size: cover;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      height: 100vh;
+      color: #fff;
+    }
+
+    .game-container {
+      width: 600px;
+      height: 600px;
+      background:#b2f192 ;
+      color: #333;
+      border-radius: 30px;
+      padding: 20px;
+      box-shadow: 0 15px 40px rgba(0, 0, 0, 0.3);
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      text-align: center;
+    }
+
+    h2 {
+      font-size: 40px;
+      color: #0b5345;
+      -webkit-text-stroke: 1px#f7f9f9;
+    }
+
+    .hint {
+      font-size: 25px;
+      margin-bottom: 20px;
+      color: #3c6382;
+      -webkit-text-stroke: 0.5px #fff;
+    }
+
+    .emojis {
+      font-size: 80px;
+      margin: 25px 0;
+    }
+
+    .input-area {
+      margin-top: 20px;
+    }
+
+    input[type="text"] {
+      padding: 14px;
+      font-size: 20px;
+      width: 80%;
+      border: 3px solid #ff6b81;
+      border-radius: 20px;
+      outline: none;
+      margin-bottom: 12px;
+      font-family: 'Luckiest Guy', cursive;
+      text-align: center;
+    }
+
+    button {
+      padding: 10px 24px;
+      font-size: 20px;
+      background-color: #54a0ff;
+      color: white;
+      border: none;
+      border-radius: 15px;
+      cursor: pointer;
+      font-family: 'Luckiest Guy', cursive;
+    }
+
+    .result {
+      font-size: 22px;
+      margin-top: 15px;
+      min-height: 30px;
+      color: #ee5253;
+    }
+
+    .timer {
+      margin-top: 10px;
+      font-size: 20px;
+      color: #10ac84;
+    }
+     .go-back {
+  position: absolute;
+  top: 50px;
+  left: 100px;
+  background-color: #a4f4b0; /* 🟢 Light green */
+  color: #155724;
+  border: 3px solid #6bd97f;
+  padding: 12px 24px;
+  border-radius: 12px;
+  font-family: 'Fredoka One', cursive;
+  font-size: 18px;
+  cursor: pointer;
+  z-index: 10;
+  box-shadow: 0 4px 0 #6bd97f;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.go-back:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+}
+
+  </style>
+</head>
+<body>
+  <div class="game-container">
+    <h2>Emoji Guessing Game</h2>
+    <div class="hint" id="hint">Hint: ___</div>
+    <div class="emojis" id="emoji-display">💪🪑</div>
+    <div class="input-area">
+      <input type="text" id="user-input" placeholder="Your guess here..." />
+      <br>
+      <button onclick="checkAnswer()">Submit</button>
+    </div>
+    <div class="result" id="result"></div>
+    <div class="timer" id="timer">Time Left: 30s</div>
+  </div>
+  <button class="go-back" onclick="window.location.href='index.html'">⬅ Go Back</button>
+
+
+  <script>
+    const questions = [
+      { emojis: '💪🪑', hint: 'lifting, uncomfortable', answer: 'workout chair' },
+      { emojis: '🌧️☔', hint: 'weather, wet', answer: 'rainy day' },
+      { emojis: '🎓📚', hint: 'learning, class', answer: 'school' },
+      { emojis: '🚗💨', hint: 'speed, travel', answer: 'fast car' },
+      { emojis: '🍕❤️', hint: 'food, love', answer: 'love pizza' },
+      { emojis: '🎉🎂', hint: 'celebration, age', answer: 'birthday party' },
+      { emojis: '🌍✈️', hint: 'explore, places', answer: 'world travel' },
+      { emojis: '🏠💤', hint: 'rest, home', answer: 'sleep at home' },
+      { emojis: '🔥🚒', hint: 'danger, rescue', answer: 'fire truck' },
+      { emojis: '🐶🐱', hint: 'animals, pets', answer: 'pet animals' }
+    ];
+
+    let current = 0;
+    let tries = 0;
+    let timer;
+    let timeLeft = 30;
+
+    function displayQuestion() {
+      document.getElementById('emoji-display').textContent = questions[current].emojis;
+      document.getElementById('hint').textContent = `Hint: ${questions[current].hint}`;
+      document.getElementById('result').textContent = '';
+      document.getElementById('user-input').value = '';
+      tries = 0;
+      timeLeft = 30;
+      document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+      clearInterval(timer);
+      timer = setInterval(updateTimer, 1000);
+    }
+
+    function updateTimer() {
+      timeLeft--;
+      document.getElementById('timer').textContent = `Time Left: ${timeLeft}s`;
+      if (timeLeft === 0) {
+        clearInterval(timer);
+        document.getElementById('result').textContent = `⏱️ Time's up! The answer was: ${questions[current].answer}`;
+        current++;
+        if (current < questions.length) {
+          setTimeout(displayQuestion, 4000);
+        } else {
+          document.getElementById('result').textContent += '\n🎉 You finished all guesses!';
+        }
+      }
+    }
+
+    function checkAnswer() {
+      const input = document.getElementById('user-input').value.trim().toLowerCase();
+      const correct = questions[current].answer.toLowerCase();
+      tries++;
+
+      if (input === correct) {
+        clearInterval(timer);
+        document.getElementById('result').textContent = '✅ Correct!';
+        current++;
+        if (current < questions.length) {
+          setTimeout(displayQuestion, 4000);
+        } else {
+          document.getElementById('result').textContent = '🎉 You finished all guesses!';
+        }
+      } else {
+        if (tries >= 3) {
+          clearInterval(timer);
+          document.getElementById('result').textContent = `❌ 3 tries over! The answer was: ${questions[current].answer}`;
+          current++;
+          if (current < questions.length) {
+            setTimeout(displayQuestion, 4000);
+          } else {
+            document.getElementById('result').textContent += '\n🎉 You finished all guesses!';
+          }
+        } else {
+          document.getElementById('result').textContent = `❌ Try again! (${tries}/3)`;
+        }
+      }
+    }
+
+    displayQuestion();
+  </script>
+</body>
+</html>

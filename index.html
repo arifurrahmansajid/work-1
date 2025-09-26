@@ -1,0 +1,82 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Game Hub</title>
+  <link rel="stylesheet" href="styles.css"/>
+</head>
+<body>
+  <!-- Banner -->
+  <header class="banner">
+  <!-- Navbar -->
+  <nav class="navbar">
+    <div class="navbar-left">
+      <span class="navbar-logo">🎮</span>
+      <span class="navbar-title">Game Hub</span>
+    </div>
+    <div class="navbar-right">
+      <button class="navbar-btn" id="signInBtn">Sign In</button>
+      <button class="navbar-btn" id="signOutBtn">Sign Out</button>
+    </div>
+  </nav>
+    <img src="gamebg.jpg" alt="Game Hub Banner" class="banner-img" />
+    <div class="banner-title">
+      <h1>Game Hub</h1>
+      <p>Play, Enjoy, Repeat!</p>
+    </div>
+  </header>
+
+  <!-- OAuth Section -->
+ 
+
+  <!-- Animated Birthday Gift Reveal for Games -->
+  <section class="games-section">
+    <h2 class="bubble-text">Choose a Game</h2>
+    <div class="gift-wrapper">
+      <div class="gift-box" id="giftBox">
+        <div class="gift-lid"></div>
+        <div class="gift-body"></div>
+        <div class="gift-ribbon"></div>
+        <span class="gift-text">Click to reveal games!</span>
+      </div>
+      <div class="games-grid hidden" id="gamesGrid">
+        <a href="emoji.html" class="game-card" data-game="Emoji Guessing">
+          <div class="game-box"></div>
+          <div class="game-label">Emoji Guessing</div>
+        </a>
+        <a href="memory.html" class="game-card" data-game="Memory Card">
+          <div class="game-box"></div>
+          <div class="game-label">Memory Card</div>
+        </a>
+        <a href="tic.html" class="game-card" data-game="Tic Tac Toe">
+          <div class="game-box"></div>
+          <div class="game-label">Tic Tac Toe</div>
+        </a>
+        <a href="flappy.html" class="game-card" data-game="Flappy Bird">
+          <div class="game-box"></div>
+          <div class="game-label">Flappy Bird</div>
+        </a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Popup -->
+  <div class="popup" id="popup">
+    <div class="popup-content">
+      <p id="popup-text"></p>
+      <button id="yes-btn">Yes</button>
+      <button id="no-btn">No</button>
+    </div>
+  </div>
+
+  <!-- Footer -->
+  <footer class="footer">
+    <p>&copy; 2025 Game Hub. All rights reserved.</p>
+    <p>Made with ❤️ for gamers.</p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
